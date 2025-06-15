@@ -1,0 +1,172 @@
+ 배경지식
+@@@@@@@@@@@@@@@@@@@@@@@@
+새폴더/           ← ✅ 워킹 트리 (Working Tree)
+├── .git/         ← ✅ Git 저장소 (커밋 내역, 브랜치 등 저장)
+└── index         ← ✅ Git 내부에서 스테이징 역할 (실제로는 .git 내부에 있음)
+@@@@@@@@@@@@@@@@@@@@@@@@
+HEAD는 현재 작업중인 브랜치를 가리킴
+브랜치는 커밋을 가리키므로 HEAD도 커밋을 가리킴
+결국 HEAD는 현재 작업중인 브랜치의 최근 커밋을 가리킴
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+rebase원리
+1. HEAD와 대상 브랜치의 공통 조상을 찾는다
+2. 공통 조상이후에 생성한 커밋들을 대상 브랜치 뒤로 재배치함
+(여기서 뒤로 재배치된 커밋들은 해시섬 값이 바뀜)
+@@@@@@@@@@@@@@@@@@@@@@@@@@@
+  
+
+
+10주차
+git init 현재 폴더에 git 로컬 저장소 생성
+
+
+git status ==> git 워킹트리의 상태를 보는 명령
+git status -s  ==> 짧게 요약해서 
+상태를 보여주는 명령
+
+여기서  global(현재 사용자) 대신 local(현재 git 저장소만), system(pc전체 사용자)사용가능
+git config --global <옵션명> <새로운값(설정)>지정한 전역 옵션 확인 
+git config --global --unset <옵션명> 지정한 전역 옵션 삭제
+
+git commit -a ==> add 생략하고 바로 커밋인데 (untracked파일은 커밋XX)
+
+
+git log 옵션 
+--oneline 커밋 메세지를 한줄로
+--graph 커밋 옆에 브랜치 흐름을 그래프로
+--decorate 브랜치와 태그등의 참조를 간결히 표시
+--all
+
+git remote add <원격저장소이름> <원격저장소주소>
+여기서 바로 푸쉬하면 오류남 이유는 원격저장소 주소만 등록하고 브랜치 master를 안만들어줌
+git remote -v ==> 연결된 원격저장소 정보
+
+git push -u 원격저장소별명 브랜치이름  ==> git push만 입력했을때 원격저장소에 설정한 브랜치로 푸쉬를 할게
+
+ 여기까지 흐름
+1 원격저장소 연결을 해줘야해 git remote add origin 저장소주소
+2 원격저장소에 푸쉬하는데 필요한 브랜치 생성 git push -u master
+3 원격저장소에 푸쉬 git push 
+   
+git clone <저장소주소> [새로운 폴더명]
+git pull
+
+
+
+11주차
+git branch (-v) ==> 로컬저장소의 브랜치 목록 보기 , -v 사용시 마지막 커밋도 함께 표시
+git branch <브랜치이름>  ==> 브랜치 생성
+git branch -f <브랜치이름> [커밋체크섬] ==> 이미 있는 브랜치를 다른 커밋으로 옮김
+
+git branch -d <브랜치이름> ==>  특정 브랜치 삭제
+git branch -D <브랜치이름> ==> 브랜치를 강제 삭제
+
+git checkout <브랜치이름>  ==> 다른 브랜치로 이동
+git checkout -b <브랜치이름> <커밋체크섬> ==>브런치 생성하고 체크아웃
+
+git merge <대상브랜치>  ==> 병합함
+git rebase <대상브랜치>  ==> 내가(현재 브랜치) (다른 브랜치)로 간다는 느낌으로 재배치 완료후  브랜치(나)의 커밋 위치는 변하지않음
+git rebas --continue  ==> 파일 충돌 해결
+
+
+git reflog ==>> 로컬저장소의 커밋 또는 브랜치의 변경사항을 기록한 로그
+
+git reset -hard <이동할 커밋 체크섬> ==>현재 브랜치를 지정한 커밋으로 옮김
+HEAD~<숫자>  ==> HEAD~는 헤드의 부모 커밋, HEAD2는 헤드의 할아버지 커밋을 말함
+HEAD^<숫자> ==> HEAD^은 똑같이 부모커밋 , HEAD^2는 두 번째 부모를 가리킴(부모가 둘 이상인 커밋에서 의미가 있음)
+
+*git reset --hard HEAD~2 는 다음 명령을 수행한 것과 동일
+git checkout HEAD~2    ==> HEAD를 HEAD~2로 이동 브랜치는 안옮겨짐
+git branch -f master      ==> 브랜치 옮기기
+git checkout master
+즉, 브랜치 포인터 + index + 워킹 트리 모두 롤백됨
+
+git tag -a -m <간단한 메세지> <태그이름> [브랜치 또는 체크섬] ==> -a로 주석있는 태그를 생성함
+git push <원격저장소 별명> <태그 이름>
+
+
+
+12주차
+git의 4대 오브젝트
+blob => 바이너리 데이터 자체 저장, 파일명은 SHA1 40자
+tree => 디렉토리 내용(파일이름 속성등)을 저장
+commit ==> working tree의 snapshot
+tag
+
+
+git hash-object <파일명>==> 일반 파일의 체크섬 확인  //파일명을 알때 (체크섬 나옴)
+git ls-files --stage ==> 스테이지 파일의 내용을 표시함  //add 되있는 파일을 알고싶을때 (체크섬  나옴)
+git show <체크섬> ==> 해당 체크섬을 가진 객체의 내용 확인 (체크섬 이용)
+
+
+체크섬을 이용해 객체의 종류와 내용 확인하는 명령어
+git cat-file -t <체크섬>
+git cat-file <객체타입> <체크섬>  ==> git show와 비슷한데 이건 object의 타입을 알아야함
+
+git add cat.txt 명령 수행 후의 상태
+cat.txt 파일의 체크섬을 갖는 blob 객체가 생성되어 .git/object에 저장되고
+stage 내용은 .git/index에 기록됨 
+
+
+git commit --amend  ==> 커밋 수정하기 (체크섬 값도 바뀜)
+
+git write-tree ==> 트리만들기
+git ls-tree <체크섬 or HEAD> ==> 트리 해시섬 확인
+
+git commit-tree 체크섬 -p HEAD   ==> tree로 커밋하기
+
+git update-ref refs/heads/master <체크섬> ==> HEAD 갱신하기
+
+ 
+13주차
+원격저장소 관련 명령어
+git remote -v ==> 연결된 원격저장소 정보
+git remote add <원격저장소이름> <원격저장소주소>
+git remote rename <이전이름> <새이름> ==> 원격저장소의 이름을 새로운이름으로
+git remot remove <저장소이름> ==> 저장한 원격저장소를 삭제함
+
+
+git fetch [원격저장소이름] [브랜치이름] ==> 원격저장소의 커밋과 브랜치, 태그들을 로컬저장소로 가져옴 워킹트리의 내용은변하지않음
+git pull [원격저장소이름] [브랜치이름] fetch를 수행한 이후에 merge도 함께 수행함
+git push [-u 원격저장소이름 브랜치이름] ==> 해당 브랜치의 커밋들을 원격저장소로 업로드함
+git push [원격저장소이름] --all ==> 로컬저장소의 모든 브랜치의 커밋을 한꺼번에 업로드
+git push [원격저장소이름] --tags ==> 로컬저장소의 모든 태그들을 업로드함
+
+워킹트리를 정리하는 git clean
+git clean -f -fd <파일 또는 폴더이름> untracked 상태의 파일들을 삭제함 경로지정안할시 모두삭제
+
+reset은 untracked 파일은 건드리지 않음
+
+잃어버린 커밋으로 다시 돌아갈떄도 reset을 사용 reflog 사용으로 정보찾은후
+git reset hard HEAD@{n}
+
+git commit --amend -m "" ==>커밋 수정하기 커밋 체크섬 바뀜
+git diff [a] [b]  a저장소를  토대로 b저장소에 추가된 내용의 차이를 보여줌 옵션 생략시 스테이지에 추가되지 않은 변경사항을 보여주는데 신규파일은 보여주지 않음(스테이지와 워킹트리 비교)
+git diff --staged ==> 스테이지와 커밋하고 비교
+
+git add --patch <파일명> ==> 변경사항의 일부만 커밋하고 싶을떄 사용함(사실 스테이지의 올라간 파일의 내용을 수정한다 와 가까운 느낌 수정이 끝나면 수정끝나기전 상태는 untracked상태 수정끝난버전은 add된 상태)
+y: 현재 변경사항을 스테이징함
+n: 현재 변경사항을 스테이징하지않음
+e직접 스테이지에 올릴 내용을 편집함
+q: 변경사항 무시하고 종료
+
+
+git blame <파일이름> ==> 해당 파일을 변경해던 커밋 히스토리를 보여줌
+
+역조회 
+show 명령어는 해시값을 사용하여 커밋 정보를 확인
+rev-parse 명령어는 포인터의 해시 값을 알려줌
+
+
+14주차
+git stash <-u>    ==> 변경사항을 스택에 저장하고 현재 작업 폴더를 clean한 상태로 만듬 -u옵션을 사용하면 untracked 상태의 파일도 저장
+git stash list ==? stash 스택에 있는 변경사항들의 목록 확인
+git stash pop <stash객체>  ==> stash 스택에 있는 변경사항을 현재 작업 폴더에 반영함
+git stash apply <stash 객체> ==> pop과 동일한 동작 하지만  스택에 있는 stash객체 제거X
+git stash drop <stash객체> ==> 지정한 객체 삭제
+git stash clear  ==> 스택의 모든 stash 객체를 삭제함
+git stash branch <stash객체> ==> 마지막 체크아웃된 커밋에 stash내용을 반영해서 새로운 브랜치를 만듦
+
+.git/refs/stash 생성
+
+git cherry-pick <체크섬>
